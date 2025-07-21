@@ -1,3 +1,31 @@
+import _get from 'lodash/get';
+
+const calcOperationOptions = EntryStatic.isPracticalCourse
+    ? [
+          [Lang.Blocks.CALC_calc_operation_unnatural, 'unnatural'],
+          [Lang.Blocks.CALC_calc_operation_floor, 'floor'],
+          [Lang.Blocks.CALC_calc_operation_ceil, 'ceil'],
+          [Lang.Blocks.CALC_calc_operation_round, 'round'],
+      ]
+    : [
+          [Lang.Blocks.CALC_calc_operation_square, 'square'],
+          [Lang.Blocks.CALC_calc_operation_root, 'root'],
+          [Lang.Blocks.CALC_calc_operation_sin, 'sin'],
+          [Lang.Blocks.CALC_calc_operation_cos, 'cos'],
+          [Lang.Blocks.CALC_calc_operation_tan, 'tan'],
+          [Lang.Blocks.CALC_calc_operation_asin, 'asin_radian'],
+          [Lang.Blocks.CALC_calc_operation_acos, 'acos_radian'],
+          [Lang.Blocks.CALC_calc_operation_atan, 'atan_radian'],
+          [Lang.Blocks.CALC_calc_operation_log, 'log'],
+          [Lang.Blocks.CALC_calc_operation_ln, 'ln'],
+          [Lang.Blocks.CALC_calc_operation_unnatural, 'unnatural'],
+          [Lang.Blocks.CALC_calc_operation_floor, 'floor'],
+          [Lang.Blocks.CALC_calc_operation_ceil, 'ceil'],
+          [Lang.Blocks.CALC_calc_operation_round, 'round'],
+          [Lang.Blocks.CALC_calc_operation_factorial, 'factorial'],
+          [Lang.Blocks.CALC_calc_operation_abs, 'abs'],
+      ];
+
 module.exports = {
     getBlocks() {
         return {
@@ -14,7 +42,12 @@ module.exports = {
                     },
                     {
                         type: 'Dropdown',
-                        options: [['+', 'PLUS'], ['-', 'MINUS'], ['x', 'MULTI'], ['/', 'DIVIDE']],
+                        options: [
+                            ['+', 'PLUS'],
+                            ['-', 'MINUS'],
+                            ['x', 'MULTI'],
+                            ['/', 'DIVIDE'],
+                        ],
                         value: 'PLUS',
                         fontSize: 10,
                         bgColor: EntryStatic.colorSet.block.darken.CALC,
@@ -120,23 +153,36 @@ module.exports = {
                 },
                 class: 'calc',
                 isNotFor: [],
-                func: function(sprite, script) {
-                    var operator = script.getField('OPERATOR', script);
-                    var leftValue = script.getNumberValue('LEFTHAND', script);
-                    var rightValue = script.getNumberValue('RIGHTHAND', script);
-                    if (operator == 'PLUS') {
-                        var leftStringValue = script.getValue('LEFTHAND', script);
-                        var rightStringValue = script.getValue('RIGHTHAND', script);
-                        if (!Entry.Utils.isNumber(leftStringValue)) leftValue = leftStringValue;
-                        if (!Entry.Utils.isNumber(rightStringValue)) rightValue = rightStringValue;
-                        if (typeof leftValue === 'number' && typeof rightValue === 'number')
+                func(sprite, script) {
+                    const operator = script.getField('OPERATOR', script);
+                    let leftValue = script.getNumberValue('LEFTHAND', script);
+                    let rightValue = script.getNumberValue('RIGHTHAND', script);
+                    if (operator === 'PLUS') {
+                        const leftStringValue = script.getValue('LEFTHAND', script);
+                        const rightStringValue = script.getValue('RIGHTHAND', script);
+                        if (!Entry.Utils.isNumber(leftStringValue)) {
+                            leftValue = leftStringValue;
+                        }
+                        if (!Entry.Utils.isNumber(rightStringValue)) {
+                            rightValue = rightStringValue;
+                        }
+                        if (typeof leftValue === 'number' && typeof rightValue === 'number') {
                             return new BigNumber(leftValue).plus(rightValue).toNumber();
-                        else return leftValue + rightValue;
+                        } else {
+                            return leftValue + rightValue;
+                        }
                     }
+                    // below statements assume both arguments are number
                     leftValue = new BigNumber(leftValue);
-                    if (operator == 'MINUS') return leftValue.minus(rightValue).toNumber();
-                    else if (operator == 'MULTI') return leftValue.times(rightValue).toNumber();
-                    else return leftValue.dividedBy(rightValue).toNumber();
+                    rightValue = new BigNumber(rightValue);
+
+                    if (operator === 'MINUS') {
+                        return leftValue.minus(rightValue).toNumber();
+                    } else if (operator === 'MULTI') {
+                        return leftValue.times(rightValue).toNumber();
+                    } else {
+                        return leftValue.dividedBy(rightValue).toNumber();
+                    }
                 },
                 syntax: {
                     js: [],
@@ -245,16 +291,18 @@ module.exports = {
                 },
                 class: 'calc',
                 isNotFor: [],
-                func: function(sprite, script) {
-                    var leftValue = script.getStringValue('LEFTHAND', script);
-                    var rightValue = script.getStringValue('RIGHTHAND', script);
-                    var left = Math.min(leftValue, rightValue);
-                    var right = Math.max(leftValue, rightValue);
-                    var isLeftFloat = Entry.isFloat(leftValue);
-                    var isRightFloat = Entry.isFloat(rightValue);
-                    if (isRightFloat || isLeftFloat)
+                func(sprite, script) {
+                    const leftValue = script.getStringValue('LEFTHAND', script);
+                    const rightValue = script.getStringValue('RIGHTHAND', script);
+                    const left = Math.min(leftValue, rightValue);
+                    const right = Math.max(leftValue, rightValue);
+                    const isLeftFloat = Entry.isFloat(leftValue);
+                    const isRightFloat = Entry.isFloat(rightValue);
+                    if (isRightFloat || isLeftFloat) {
                         return (Math.random() * (right - left) + left).toFixed(2);
-                    else return Math.floor(Math.random() * (right - left + 1) + left);
+                    } else {
+                        return Math.floor(Math.random() * (right - left + 1) + left);
+                    }
                 },
                 syntax: {
                     js: [],
@@ -313,7 +361,10 @@ module.exports = {
                     },
                     {
                         type: 'Dropdown',
-                        options: [['x', 'x'], ['y', 'y']],
+                        options: [
+                            ['x', 'x'],
+                            ['y', 'y'],
+                        ],
                         value: 'x',
                         fontSize: 10,
                         bgColor: EntryStatic.colorSet.block.darken.CALC,
@@ -339,8 +390,8 @@ module.exports = {
                 },
                 class: 'calc',
                 isNotFor: [],
-                func: function(sprite, script) {
-                    var targetCoordinate = script.getField('VALUE', script);
+                func(sprite, script) {
+                    const targetCoordinate = script.getField('VALUE', script);
                     if (targetCoordinate === 'x') {
                         return Number(Entry.stage.mouseCoordinate.x);
                     } else {
@@ -361,7 +412,10 @@ module.exports = {
                                 },
                                 {
                                     type: 'Dropdown',
-                                    options: [['x', 'x'], ['y', 'y']],
+                                    options: [
+                                        ['x', 'x'],
+                                        ['y', 'y'],
+                                    ],
                                     value: 'x',
                                     fontSize: 11,
                                     arrowColor: EntryStatic.colorSet.arrow.default.CALC,
@@ -434,13 +488,16 @@ module.exports = {
                 },
                 class: 'calc',
                 isNotFor: [],
-                func: function(sprite, script) {
-                    var targetId = script.getField('VALUE', script);
-                    var targetEntity;
-                    if (targetId == 'self') targetEntity = sprite;
-                    else targetEntity = Entry.container.getEntity(targetId);
+                func(sprite, script) {
+                    const targetId = script.getField('VALUE', script);
+                    let targetEntity;
+                    if (targetId === 'self') {
+                        targetEntity = sprite;
+                    } else {
+                        targetEntity = Entry.container.getEntity(targetId);
+                    }
 
-                    var targetCoordinate = script.getField('COORDINATE', script);
+                    const targetCoordinate = script.getField('COORDINATE', script);
                     switch (targetCoordinate) {
                         case 'x':
                             return targetEntity.getX();
@@ -450,17 +507,19 @@ module.exports = {
                             return targetEntity.getRotation();
                         case 'direction':
                             return targetEntity.getDirection();
-                        case 'picture_index':
-                            var object = targetEntity.parent;
-                            var pictures = object.pictures;
+                        case 'picture_index': {
+                            const object = targetEntity.parent;
+                            const pictures = object.pictures;
                             return pictures.indexOf(targetEntity.picture) + 1;
+                        }
                         case 'size':
                             return Number(targetEntity.getSize().toFixed(1));
-                        case 'picture_name':
-                            var object = targetEntity.parent;
-                            var pictures = object.pictures;
-                            var picture = pictures[pictures.indexOf(targetEntity.picture)];
+                        case 'picture_name': {
+                            const object = targetEntity.parent;
+                            const pictures = object.pictures;
+                            const picture = pictures[pictures.indexOf(targetEntity.picture)];
                             return picture.name;
+                        }
                     }
                 },
                 syntax: {
@@ -499,43 +558,6 @@ module.exports = {
                                     codeMap: 'Entry.CodeMap.Entry.coordinate_object[3]',
                                 },
                             ],
-                        },
-                    ],
-                },
-            },
-            get_sound_volume: {
-                color: EntryStatic.colorSet.block.default.CALC,
-                outerLine: EntryStatic.colorSet.block.darken.CALC,
-                skeleton: 'basic_string_field',
-                statements: [],
-                params: [
-                    {
-                        type: 'Text',
-                        text: Lang.Blocks.CALC_get_sound_volume,
-                        color: '#FFF',
-                    },
-                    {
-                        type: 'Text',
-                        text: '',
-                        color: '#FFF',
-                    },
-                ],
-                events: {},
-                def: {
-                    params: [null, null],
-                    type: 'get_sound_volume',
-                },
-                class: 'calc',
-                isNotFor: [],
-                func: function(sprite, script) {
-                    return createjs.Sound.getVolume() * 100;
-                },
-                syntax: {
-                    js: [],
-                    py: [
-                        {
-                            syntax: 'Entry.value_of_sound_volume()',
-                            blockType: 'param',
                         },
                     ],
                 },
@@ -625,21 +647,22 @@ module.exports = {
                 },
                 class: 'calc',
                 isNotFor: [],
-                func: function(sprite, script) {
-                    var left = script.getNumberValue('LEFTHAND', script);
-                    var right = script.getNumberValue('RIGHTHAND', script);
-                    if (isNaN(left) || isNaN(right)) throw new Error();
-                    var operator = script.getField('OPERATOR', script);
-                    if (operator == 'QUOTIENT') return Math.floor(left / right);
-                    else return left % right;
+                func(sprite, script) {
+                    const left = script.getNumberValue('LEFTHAND', script);
+                    const right = script.getNumberValue('RIGHTHAND', script);
+                    const operator = script.getField('OPERATOR', script);
+                    if (operator === 'QUOTIENT') {
+                        return Math.floor(left / right);
+                    } else {
+                        return left - right * Math.floor(left / right);
+                    }
                 },
                 syntax: {
                     js: [],
                     py: [
                         {
-                            syntax: '(%2 // %4)',
-                            template: '%2 // %4',
-                            params: [null, null, null, null, null, 'QUOTIENT'],
+                            syntax: '(%2 %6 %4)',
+                            template: '%2 %6 %4',
                             blockType: 'param',
                             textParams: [
                                 undefined,
@@ -662,37 +685,7 @@ module.exports = {
                                     value: 'QUOTIENT',
                                     fontSize: 11,
                                     arrowColor: EntryStatic.colorSet.arrow.default.CALC,
-                                    converter: Entry.block.converters.returnStringValue,
-                                },
-                            ],
-                        },
-                        {
-                            syntax: '(%2 % %4)',
-                            template: '%2 % %4',
-                            params: [null, null, null, null, null, 'MOD'],
-                            blockType: 'param',
-                            textParams: [
-                                undefined,
-                                {
-                                    type: 'Block',
-                                    accept: 'string',
-                                },
-                                undefined,
-                                {
-                                    type: 'Block',
-                                    accept: 'string',
-                                },
-                                undefined,
-                                {
-                                    type: 'Dropdown',
-                                    options: [
-                                        [Lang.Blocks.CALC_quotient_and_mod_sub_1, 'QUOTIENT'],
-                                        [Lang.Blocks.CALC_quotient_and_mod_sub_2, 'MOD'],
-                                    ],
-                                    value: 'QUOTIENT',
-                                    fontSize: 11,
-                                    arrowColor: EntryStatic.colorSet.arrow.default.CALC,
-                                    converter: Entry.block.converters.returnStringValue,
+                                    converter: Entry.block.converters.returnOperator,
                                 },
                             ],
                         },
@@ -722,25 +715,8 @@ module.exports = {
                     },
                     {
                         type: 'Dropdown',
-                        options: [
-                            [Lang.Blocks.CALC_calc_operation_square, 'square'],
-                            [Lang.Blocks.CALC_calc_operation_root, 'root'],
-                            [Lang.Blocks.CALC_calc_operation_sin, 'sin'],
-                            [Lang.Blocks.CALC_calc_operation_cos, 'cos'],
-                            [Lang.Blocks.CALC_calc_operation_tan, 'tan'],
-                            [Lang.Blocks.CALC_calc_operation_asin, 'asin_radian'],
-                            [Lang.Blocks.CALC_calc_operation_acos, 'acos_radian'],
-                            [Lang.Blocks.CALC_calc_operation_atan, 'atan_radian'],
-                            [Lang.Blocks.CALC_calc_operation_log, 'log'],
-                            [Lang.Blocks.CALC_calc_operation_ln, 'ln'],
-                            [Lang.Blocks.CALC_calc_operation_unnatural, 'unnatural'],
-                            [Lang.Blocks.CALC_calc_operation_floor, 'floor'],
-                            [Lang.Blocks.CALC_calc_operation_ceil, 'ceil'],
-                            [Lang.Blocks.CALC_calc_operation_round, 'round'],
-                            [Lang.Blocks.CALC_calc_operation_factorial, 'factorial'],
-                            [Lang.Blocks.CALC_calc_operation_abs, 'abs'],
-                        ],
-                        value: 'square',
+                        options: calcOperationOptions,
+                        value: EntryStatic.isPracticalCourse ? 'unnatural' : 'square',
                         fontSize: 10,
                         bgColor: EntryStatic.colorSet.block.darken.CALC,
                         arrowColor: EntryStatic.colorSet.arrow.default.DEFAULT,
@@ -777,19 +753,19 @@ module.exports = {
                 },
                 class: 'calc',
                 isNotFor: [],
-                func: function(sprite, script) {
-                    var value = script.getNumberValue('LEFTHAND', script);
-                    var operator = script.getField('VALUE', script);
-                    var xRangeCheckList = ['asin_radian', 'acos_radian'];
-                    if (xRangeCheckList.indexOf(operator) > -1 && (value > 1 || value < -1))
+                func(sprite, script) {
+                    const value = script.getNumberValue('LEFTHAND', script);
+                    let operator = script.getField('VALUE', script);
+                    const xRangeCheckList = ['asin_radian', 'acos_radian'];
+                    if (xRangeCheckList.indexOf(operator) > -1 && (value > 1 || value < -1)) {
                         throw new Error('x range exceeded');
+                    }
 
-                    var needToConvertList = ['sin', 'cos', 'tan'];
-                    if (operator.indexOf('_')) operator = operator.split('_')[0];
+                    if (operator.indexOf('_')) {
+                        operator = operator.split('_')[0];
+                    }
 
-                    if (needToConvertList.indexOf(operator) > -1) value = Entry.toRadian(value);
-
-                    var returnVal = 0;
+                    let returnVal = 0;
                     switch (operator) {
                         case 'square':
                             returnVal = value * value;
@@ -811,10 +787,19 @@ module.exports = {
                         case 'atan':
                             returnVal = Entry.toDegrees(Math[operator](value));
                             break;
-                        case 'unnatural':
-                            returnVal = new BigNumber(value).minus(Math.floor(value)).toNumber();
-                            if (value < 0) returnVal = 1 - returnVal;
+                        case 'sin':
+                        case 'cos':
+                        case 'tan':
+                            returnVal = Entry.preciseTrig(value, operator);
                             break;
+                        case 'unnatural': {
+                            returnVal = new BigNumber(value).minus(Math.floor(value));
+                            returnVal = returnVal.toNumber();
+                            if (value < 0) {
+                                returnVal = 1 - returnVal;
+                            }
+                            break;
+                        }
                         default:
                             returnVal = Math[operator](value);
                     }
@@ -1079,21 +1064,20 @@ module.exports = {
                         text: Lang.Blocks.CALC_get_timer_value,
                         color: '#FFF',
                     },
-                    {
-                        type: 'Text',
-                        text: '',
-                        color: '#FFF',
-                    },
                 ],
                 events: {
                     viewAdd: [
-                        function() {
-                            if (Entry.engine) Entry.engine.showProjectTimer();
+                        function () {
+                            if (Entry.engine) {
+                                Entry.engine.showProjectTimer();
+                            }
                         },
                     ],
                     viewDestroy: [
-                        function(block, notIncludeSelf) {
-                            if (Entry.engine) Entry.engine.hideProjectTimer(block, notIncludeSelf);
+                        function (block, notIncludeSelf) {
+                            if (Entry.engine) {
+                                Entry.engine.hideProjectTimer(block, notIncludeSelf);
+                            }
                         },
                     ],
                 },
@@ -1103,7 +1087,7 @@ module.exports = {
                 },
                 class: 'calc_timer',
                 isNotFor: [],
-                func: function(sprite, script) {
+                func() {
                     return Entry.engine.projectTimer.getValue();
                 },
                 syntax: {
@@ -1142,7 +1126,7 @@ module.exports = {
                     {
                         type: 'Text',
                         text: Lang.Blocks.CALC_choose_project_timer_action_2,
-                        color: '#000',
+                        color: '#FFF',
                     },
                     {
                         type: 'Indicator',
@@ -1152,13 +1136,17 @@ module.exports = {
                 ],
                 events: {
                     viewAdd: [
-                        function() {
-                            if (Entry.engine) Entry.engine.showProjectTimer();
+                        function () {
+                            if (Entry.engine) {
+                                Entry.engine.showProjectTimer();
+                            }
                         },
                     ],
                     dataDestroy: [
-                        function(block) {
-                            if (Entry.engine) Entry.engine.hideProjectTimer(block);
+                        function (block) {
+                            if (Entry.engine) {
+                                Entry.engine.hideProjectTimer(block);
+                            }
                         },
                     ],
                 },
@@ -1175,20 +1163,21 @@ module.exports = {
                 },
                 class: 'calc_timer',
                 isNotFor: [],
-                func: function(sprite, script) {
-                    var engine = Entry.engine;
-                    var timer = engine.projectTimer;
-                    var isPaused = timer.isPaused;
-                    var isInit = timer.isInit;
-                    var currentTime = new Date().getTime();
+                func(sprite, script) {
+                    const engine = Entry.engine;
+                    const timer = engine.projectTimer;
+                    const isPaused = timer.isPaused;
+                    const isInit = timer.isInit;
+                    const currentTime = new Date().getTime();
 
                     switch (script.getField('ACTION')) {
                         case 'START':
                             if (!isInit) {
                                 engine.startProjectTimer();
                             } else if (isInit && isPaused) {
-                                if (timer.pauseStart)
+                                if (timer.pauseStart) {
                                     timer.pausedTime += currentTime - timer.pauseStart;
+                                }
                                 delete timer.pauseStart;
                                 timer.isPaused = false;
                             }
@@ -1274,8 +1263,8 @@ module.exports = {
                     },
                     {
                         type: 'Text',
-                        text: Lang.Blocks.CALC_timer_visible_2,
-                        color: '#000',
+                        text: Lang.Blocks.CALC_choose_project_timer_action_2,
+                        color: '#FFF',
                     },
                     {
                         type: 'Indicator',
@@ -1285,13 +1274,17 @@ module.exports = {
                 ],
                 events: {
                     viewAdd: [
-                        function() {
-                            if (Entry.engine) Entry.engine.showProjectTimer();
+                        function () {
+                            if (Entry.engine) {
+                                Entry.engine.showProjectTimer();
+                            }
                         },
                     ],
                     viewDestroy: [
-                        function(block, notIncludeSelf) {
-                            if (Entry.engine) Entry.engine.hideProjectTimer(block, notIncludeSelf);
+                        function (block, notIncludeSelf) {
+                            if (Entry.engine) {
+                                Entry.engine.hideProjectTimer(block, notIncludeSelf);
+                            }
                         },
                     ],
                 },
@@ -1308,11 +1301,14 @@ module.exports = {
                 },
                 class: 'calc_timer',
                 isNotFor: [],
-                func: function(sprite, script) {
-                    var action = script.getField('ACTION');
-                    var timer = Entry.engine.projectTimer;
-                    if (action == 'SHOW') timer.setVisible(true);
-                    else timer.setVisible(false);
+                func(sprite, script) {
+                    const action = script.getField('ACTION');
+                    const timer = Entry.engine.projectTimer;
+                    if (action === 'SHOW') {
+                        timer.setVisible(true);
+                    } else {
+                        timer.setVisible(false);
+                    }
 
                     return script.callReturn();
                 },
@@ -1367,6 +1363,7 @@ module.exports = {
                             [Lang.Blocks.CALC_get_date_year, 'YEAR'],
                             [Lang.Blocks.CALC_get_date_month, 'MONTH'],
                             [Lang.Blocks.CALC_get_date_day, 'DAY'],
+                            [Lang.Blocks.CALC_get_date_day_of_week, 'DAY_OF_WEEK'],
                             [Lang.Blocks.CALC_get_date_hour, 'HOUR'],
                             [Lang.Blocks.CALC_get_date_minute, 'MINUTE'],
                             [Lang.Blocks.CALC_get_date_second, 'SECOND'],
@@ -1396,15 +1393,24 @@ module.exports = {
                 },
                 class: 'calc_date',
                 isNotFor: [],
-                func: function(sprite, script) {
-                    var operator = script.getField('VALUE', script);
-                    var dateTime = new Date();
-                    if (operator == 'YEAR') return dateTime.getFullYear();
-                    else if (operator == 'MONTH') return dateTime.getMonth() + 1;
-                    else if (operator == 'DAY') return dateTime.getDate();
-                    else if (operator == 'HOUR') return dateTime.getHours();
-                    else if (operator == 'MINUTE') return dateTime.getMinutes();
-                    else return dateTime.getSeconds();
+                func(sprite, script) {
+                    const operator = script.getField('VALUE', script);
+                    const dateTime = new Date();
+                    if (operator === 'YEAR') {
+                        return dateTime.getFullYear();
+                    } else if (operator === 'MONTH') {
+                        return dateTime.getMonth() + 1;
+                    } else if (operator === 'DAY') {
+                        return dateTime.getDate();
+                    } else if (operator === 'HOUR') {
+                        return dateTime.getHours();
+                    } else if (operator === 'MINUTE') {
+                        return dateTime.getMinutes();
+                    } else if (operator === 'DAY_OF_WEEK') {
+                        return dateTime.getDay();
+                    } else {
+                        return dateTime.getSeconds();
+                    }
                 },
                 syntax: {
                     js: [],
@@ -1423,6 +1429,7 @@ module.exports = {
                                         [Lang.Blocks.CALC_get_date_hour, 'HOUR'],
                                         [Lang.Blocks.CALC_get_date_minute, 'MINUTE'],
                                         [Lang.Blocks.CALC_get_date_second, 'SECOND'],
+                                        [Lang.Blocks.CALC_get_date_day_of_week, 'DAY_OF_WEEK'],
                                     ],
                                     value: 'YEAR',
                                     fontSize: 11,
@@ -1474,16 +1481,16 @@ module.exports = {
                 },
                 class: 'calc_distance',
                 isNotFor: [],
-                func: function(sprite, script) {
-                    var targetId = script.getField('VALUE', script);
-                    if (targetId == 'mouse') {
-                        var mousePos = Entry.stage.mouseCoordinate;
+                func(sprite, script) {
+                    const targetId = script.getField('VALUE', script);
+                    if (targetId === 'mouse') {
+                        const mousePos = Entry.stage.mouseCoordinate;
                         return Math.sqrt(
                             Math.pow(sprite.getX() - mousePos.x, 2) +
                                 Math.pow(sprite.getY() - mousePos.y, 2)
                         );
                     } else {
-                        var targetEntity = Entry.container.getEntity(targetId);
+                        const targetEntity = Entry.container.getEntity(targetId);
                         return Math.sqrt(
                             Math.pow(sprite.getX() - targetEntity.getX(), 2) +
                                 Math.pow(sprite.getY() - targetEntity.getY(), 2)
@@ -1512,74 +1519,6 @@ module.exports = {
                     ],
                 },
             },
-            get_sound_duration: {
-                color: EntryStatic.colorSet.block.default.CALC,
-                outerLine: EntryStatic.colorSet.block.darken.CALC,
-                skeleton: 'basic_string_field',
-                statements: [],
-                params: [
-                    {
-                        type: 'Text',
-                        text: Lang.Blocks.CALC_get_sound_duration_1,
-                        color: '#FFF',
-                    },
-                    {
-                        type: 'DropdownDynamic',
-                        value: null,
-                        menuName: 'sounds',
-                        fontSize: 10,
-                        bgColor: EntryStatic.colorSet.block.darken.CALC,
-                        arrowColor: EntryStatic.colorSet.arrow.default.DEFAULT,
-                    },
-                    {
-                        type: 'Text',
-                        text: Lang.Blocks.CALC_get_sound_duration_2,
-                        color: '#FFF',
-                    },
-                ],
-                events: {},
-                def: {
-                    params: [null, null, null],
-                    type: 'get_sound_duration',
-                },
-                pyHelpDef: {
-                    params: [null, 'A&value', null],
-                    type: 'get_sound_duration',
-                },
-                paramsKeyMap: {
-                    VALUE: 1,
-                },
-                class: 'calc_duration',
-                isNotFor: [],
-                func: function(sprite, script) {
-                    var soundId = script.getField('VALUE', script);
-                    var soundsArr = sprite.parent.sounds;
-
-                    for (var i = 0; i < soundsArr.length; i++) {
-                        if (soundsArr[i].id == soundId) return soundsArr[i].duration;
-                    }
-                },
-                syntax: {
-                    js: [],
-                    py: [
-                        {
-                            syntax: 'Entry.value_of_sound_length_of(%2)',
-                            blockType: 'param',
-                            textParams: [
-                                undefined,
-                                {
-                                    type: 'DropdownDynamic',
-                                    value: null,
-                                    menuName: 'sounds',
-                                    fontSize: 11,
-                                    arrowColor: EntryStatic.colorSet.arrow.default.CALC,
-                                    converter: Entry.block.converters.returnStringKey,
-                                },
-                            ],
-                        },
-                    ],
-                },
-            },
             get_user_name: {
                 color: EntryStatic.colorSet.block.default.CALC,
                 fontColor: '#FFF',
@@ -1594,7 +1533,7 @@ module.exports = {
                 },
                 class: 'calc_user',
                 isNotFor: [],
-                func: function(sprite, script) {
+                func() {
                     return window.user ? window.user.username : ' ';
                 },
                 syntax: {
@@ -1602,6 +1541,33 @@ module.exports = {
                     py: [
                         {
                             syntax: 'Entry.value_of_username()',
+                            blockType: 'param',
+                        },
+                    ],
+                },
+            },
+            get_nickname: {
+                color: EntryStatic.colorSet.block.default.CALC,
+                fontColor: '#FFF',
+                outerLine: EntryStatic.colorSet.block.darken.CALC,
+                skeleton: 'basic_string_field',
+                statements: [],
+                params: [],
+                events: {},
+                def: {
+                    params: [],
+                    type: 'get_nickname',
+                },
+                class: 'calc_user',
+                isNotFor: [],
+                func() {
+                    return window.user ? window.user.nickname : ' ';
+                },
+                syntax: {
+                    js: [],
+                    py: [
+                        {
+                            syntax: 'Entry.value_of_nickname()',
                             blockType: 'param',
                         },
                     ],
@@ -1656,7 +1622,7 @@ module.exports = {
                 },
                 class: 'calc_string',
                 isNotFor: [],
-                func: function(sprite, script) {
+                func(sprite, script) {
                     return script.getStringValue('STRING', script).length;
                 },
                 syntax: {
@@ -1668,6 +1634,54 @@ module.exports = {
                             keyOption: 'length_of_string',
                         },
                     ],
+                },
+            },
+            reverse_of_string: {
+                color: EntryStatic.colorSet.block.default.CALC,
+                outerLine: EntryStatic.colorSet.block.darken.CALC,
+                skeleton: 'basic_string_field',
+                statements: [],
+                params: [
+                    {
+                        type: 'Text',
+                        text: Lang.Blocks.CALC_reverse_of_string_1,
+                        color: '#FFF',
+                    },
+                    {
+                        type: 'Block',
+                        accept: 'string',
+                    },
+                    {
+                        type: 'Text',
+                        text: Lang.Blocks.CALC_reverse_of_string_2,
+                        color: '#FFF',
+                    },
+                ],
+                events: {},
+                def: {
+                    params: [
+                        null,
+                        {
+                            type: 'text',
+                            params: [Lang.Blocks.entry],
+                        },
+                        null,
+                    ],
+                    type: 'reverse_of_string',
+                },
+                paramsKeyMap: {
+                    STRING: 1,
+                },
+                class: 'calc_string',
+                isNotFor: ['python_disable'],
+                func(sprite, script) {
+                    const originStr = script.getStringValue('STRING', script);
+                    const reversedStr = originStr.split('').reverse().join('');
+                    return reversedStr;
+                },
+                syntax: {
+                    js: [],
+                    py: [],
                 },
             },
             combine_something: {
@@ -1739,11 +1753,11 @@ module.exports = {
                 },
                 class: 'calc_string',
                 isNotFor: [],
-                func: function(sprite, script) {
-                    var leftValue = script.getStringValue('VALUE1', script);
-                    var rightValue = script.getStringValue('VALUE2', script);
+                func(sprite, script) {
+                    const leftValue = script.getStringValue('VALUE1', script);
+                    const rightValue = script.getStringValue('VALUE2', script);
 
-                    return leftValue + rightValue;
+                    return `${leftValue}${rightValue}`;
                 },
                 syntax: {
                     js: [],
@@ -1827,11 +1841,14 @@ module.exports = {
                 },
                 class: 'calc_string',
                 isNotFor: [],
-                func: function(sprite, script) {
-                    var str = script.getStringValue('LEFTHAND', script);
-                    var index = script.getNumberValue('RIGHTHAND', script) - 1;
-                    if (index < 0 || index > str.length - 1) throw new Error();
-                    else return str[index];
+                func(sprite, script) {
+                    const str = script.getStringValue('LEFTHAND', script);
+                    const index = script.getNumberValue('RIGHTHAND', script) - 1;
+                    if (index < 0 || index > str.length - 1) {
+                        throw new Error();
+                    } else {
+                        return str[index];
+                    }
                 },
                 syntax: {
                     js: [],
@@ -1962,13 +1979,16 @@ module.exports = {
                 },
                 class: 'calc_string',
                 isNotFor: [],
-                func: function(sprite, script) {
-                    var str = script.getStringValue('STRING', script);
-                    var start = script.getNumberValue('START', script) - 1;
-                    var end = script.getNumberValue('END', script) - 1;
-                    var strLen = str.length - 1;
-                    if (start < 0 || end < 0 || start > strLen || end > strLen) throw new Error();
-                    else return str.substring(Math.min(start, end), Math.max(start, end) + 1);
+                func(sprite, script) {
+                    const str = script.getStringValue('STRING', script);
+                    const start = script.getNumberValue('START', script) - 1;
+                    const end = script.getNumberValue('END', script) - 1;
+                    const strLen = str.length - 1;
+                    if (start < 0 || end < 0 || start > strLen || end > strLen) {
+                        throw new Error();
+                    } else {
+                        return str.substring(Math.min(start, end), Math.max(start, end) + 1);
+                    }
                 },
                 syntax: {
                     js: [],
@@ -1997,6 +2017,63 @@ module.exports = {
                             ],
                         },
                     ],
+                },
+            },
+            count_match_string: {
+                color: EntryStatic.colorSet.block.default.CALC,
+                outerLine: EntryStatic.colorSet.block.darken.CALC,
+                skeleton: 'basic_string_field',
+                statements: [],
+                params: [
+                    {
+                        type: 'Block',
+                        accept: 'string',
+                    },
+                    {
+                        type: 'Text',
+                        text: Lang.Blocks.CALC_count_match_string_1,
+                        color: '#FFF',
+                    },
+                    {
+                        type: 'Block',
+                        accept: 'string',
+                    },
+                    {
+                        type: 'Text',
+                        text: Lang.Blocks.CALC_count_match_string_2,
+                        color: '#FFF',
+                    },
+                ],
+                events: {},
+                def: {
+                    params: [
+                        {
+                            type: 'text',
+                            params: [Lang.Blocks.hi_entry_en],
+                        },
+                        null,
+                        {
+                            type: 'text',
+                            params: ['e'],
+                        },
+                        null,
+                    ],
+                    type: 'count_match_string',
+                },
+                paramsKeyMap: {
+                    STRING: 0,
+                    TARGET: 2,
+                },
+                class: 'calc_string',
+                isNotFor: ['python_disable'],
+                func(sprite, script) {
+                    const originStr = script.getStringValue('STRING', script);
+                    const targetStr = script.getStringValue('TARGET', script);
+                    return originStr.split(targetStr).length - 1;
+                },
+                syntax: {
+                    js: [],
+                    py: [],
                 },
             },
             index_of_string: {
@@ -2068,10 +2145,10 @@ module.exports = {
                 },
                 class: 'calc_string',
                 isNotFor: [],
-                func: function(sprite, script) {
-                    var str = script.getStringValue('LEFTHAND', script);
-                    var target = script.getStringValue('RIGHTHAND', script);
-                    var index = str.indexOf(target);
+                func(sprite, script) {
+                    const str = script.getStringValue('LEFTHAND', script);
+                    const target = script.getStringValue('RIGHTHAND', script);
+                    const index = str.indexOf(target);
                     return index + 1;
                 },
                 syntax: {
@@ -2173,13 +2250,11 @@ module.exports = {
                 },
                 class: 'calc_string',
                 isNotFor: [],
-                func: function(sprite, script) {
-                    return script
-                        .getStringValue('STRING', script)
-                        .replace(
-                            new RegExp(script.getStringValue('OLD_WORD', script), 'gm'),
-                            script.getStringValue('NEW_WORD', script)
-                        );
+                func(sprite, script) {
+                    const oldWord = script.getStringValue('OLD_WORD', script);
+                    const newWord = script.getStringValue('NEW_WORD', script);
+                    const originalString = script.getStringValue('STRING', script);
+                    return originalString.split(oldWord).join(newWord);
                 },
                 syntax: {
                     js: [],
@@ -2261,7 +2336,7 @@ module.exports = {
                 },
                 class: 'calc_string',
                 isNotFor: [],
-                func: function(sprite, script) {
+                func(sprite, script) {
                     return script
                         .getStringValue('STRING', script)
                         [script.getField('CASE', script)]();
@@ -2316,6 +2391,221 @@ module.exports = {
                                     converter: Entry.block.converters.returnStringValue,
                                 },
                             ],
+                        },
+                    ],
+                },
+            },
+            get_block_count: {
+                color: EntryStatic.colorSet.block.default.CALC,
+                outerLine: EntryStatic.colorSet.block.darken.CALC,
+                skeleton: 'basic_string_field',
+                statements: [],
+                params: [
+                    {
+                        type: 'DropdownDynamic',
+                        value: null,
+                        menuName: 'blockCount',
+                        fontSize: 10,
+                        textColor: '#fff',
+                        bgColor: EntryStatic.colorSet.block.darken.CALC,
+                        arrowColor: EntryStatic.colorSet.arrow.default.DEFAULT,
+                    },
+                ],
+                events: {},
+                def: {
+                    params: [null],
+                    type: 'get_block_count',
+                },
+                pyHelpDef: {
+                    params: ['A&value'],
+                    type: 'get_block_count',
+                },
+                paramsKeyMap: {
+                    OBJECT: 0,
+                },
+                class: 'block',
+                isNotFor: [],
+                async func(sprite, script) {
+                    const objectKey = script.getField('OBJECT', script);
+                    if (!objectKey) {
+                        return 0;
+                    }
+                    let object;
+                    if (objectKey.indexOf('scene-') === 0) {
+                        const blocks = await Entry.Utils.getObjectsBlocksBySceneId(
+                            objectKey.substr(6)
+                        );
+                        return _get(blocks, 'length', 0);
+                    } else if (objectKey === 'all') {
+                        object = undefined;
+                    } else if (objectKey === 'self') {
+                        object = sprite.parent;
+                    } else if (objectKey.indexOf('object-') === 0) {
+                        object = Entry.container.getObject(objectKey.substr(7));
+                    } else {
+                        return 0;
+                    }
+
+                    const blocks = await Entry.Utils.getObjectsBlocksForEventThread(object);
+                    const count = _get(blocks, 'length', 0);
+                    return count;
+                },
+                syntax: {
+                    js: [],
+                    py: [
+                        {
+                            syntax: 'Entry.get_block_count(%1)',
+                            blockType: 'param',
+                            textParams: [
+                                {
+                                    type: 'DropdownDynamic',
+                                    value: null,
+                                    menuName: 'blockCount',
+                                    fontSize: 11,
+                                    textColor: '#fff',
+                                    arrowColor: EntryStatic.colorSet.arrow.default.DEFAULT,
+                                    converter: Entry.block.converters.returnStringValue,
+                                    codeMap: 'Entry.CodeMap.Entry.get_block_count[0]',
+                                },
+                            ],
+                        },
+                    ],
+                },
+            },
+            change_rgb_to_hex: {
+                color: EntryStatic.colorSet.block.default.CALC,
+                outerLine: EntryStatic.colorSet.block.darken.CALC,
+                skeleton: 'basic_string_field',
+                statements: [],
+                params: [
+                    {
+                        type: 'Block',
+                        accept: 'string',
+                        defaultType: 'number',
+                    },
+                    {
+                        type: 'Block',
+                        accept: 'string',
+                        defaultType: 'number',
+                    },
+                    {
+                        type: 'Block',
+                        accept: 'string',
+                        defaultType: 'number',
+                    },
+                ],
+                events: {},
+                def: {
+                    params: [
+                        {
+                            type: 'number',
+                            params: ['255'],
+                        },
+                        {
+                            type: 'number',
+                            params: ['0'],
+                        },
+                        {
+                            type: 'number',
+                            params: ['0'],
+                        },
+                    ],
+                    type: 'change_rgb_to_hex',
+                },
+                paramsKeyMap: {
+                    RED: 0,
+                    GREEN: 1,
+                    BLUE: 2,
+                },
+                class: 'color',
+                isNotFor: [],
+                func(sprite, script) {
+                    const red = script.getNumberValue('RED', script);
+                    const greeb = script.getNumberValue('GREEN', script);
+                    const blue = script.getNumberValue('BLUE', script);
+                    return Entry.rgb2hex(red, greeb, blue);
+                },
+            },
+            change_hex_to_rgb: {
+                color: EntryStatic.colorSet.block.default.CALC,
+                outerLine: EntryStatic.colorSet.block.darken.CALC,
+                skeleton: 'basic_string_field',
+                statements: [],
+                params: [
+                    {
+                        type: 'Block',
+                        accept: 'string',
+                    },
+                    {
+                        type: 'Dropdown',
+                        options: [
+                            ['R', 'r'],
+                            ['G', 'g'],
+                            ['B', 'b'],
+                        ],
+                        value: 'RED',
+                        fontSize: 10,
+                        bgColor: EntryStatic.colorSet.block.darken.CALC,
+                    },
+                ],
+                events: {},
+                def: {
+                    params: [
+                        {
+                            type: 'text',
+                            params: ['#ff0000'],
+                        },
+                        'r',
+                    ],
+                    type: 'change_hex_to_rgb',
+                },
+                paramsKeyMap: {
+                    HEX: 0,
+                    COLOR: 1,
+                },
+                class: 'color',
+                isNotFor: [],
+                func(sprite, script) {
+                    const color = script.getField('COLOR', script);
+                    const value = script.getValue('HEX', script);
+                    return Entry.hex2rgb(value)[color];
+                },
+            },
+            get_boolean_value: {
+                color: EntryStatic.colorSet.block.default.CALC,
+                fontColor: '#FFF',
+                outerLine: EntryStatic.colorSet.block.darken.CALC,
+                skeleton: 'basic_string_field',
+                statements: [],
+                params: [
+                    {
+                        type: 'Block',
+                        accept: 'boolean',
+                    },
+                ],
+                events: {},
+                def: {
+                    params: [{ type: 'True' }],
+                    type: 'get_boolean_value',
+                },
+                class: 'calc_boolean',
+                isNotFor: [],
+                paramsKeyMap: {
+                    BOOLEAN: 0,
+                },
+                func(sprite, script) {
+                    const bool = script.getValue('BOOLEAN', script);
+                    if (Boolean(bool)) {
+                        return 'TRUE';
+                    }
+                    return 'FALSE';
+                },
+                syntax: {
+                    js: [],
+                    py: [
+                        {
+                            syntax: 'Entry.value_of_username()',
+                            blockType: 'param',
                         },
                     ],
                 },
